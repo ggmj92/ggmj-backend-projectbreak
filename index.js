@@ -2,9 +2,10 @@ const express = require('express');
 const dbConnection = require('./config/config'); 
 const app = express();
 require('dotenv').config();  // To use environment variables
-PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
+const routes = require('./routes/artworkRoute');
 
-app.get('/', (req, res) => (res.send("GGMJ's Backend Project")))
+app.use('/', routes);
 
 dbConnection();
 
