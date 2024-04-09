@@ -4,7 +4,7 @@ const ArtworkSchema = new mongoose.Schema(
     {
         artist: String,
         title: String,
-        year: Number,
+        year: String,
         type: String,
         media: String,
         dimensions: String,

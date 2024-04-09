@@ -5,6 +5,7 @@ require('dotenv').config();  // To use environment variables
 const PORT = process.env.PORT || 3000;
 const routes = require('./routes/artworkRoute');
 
+app.use(express.json());
 app.use('/', routes);
 
 dbConnection();
