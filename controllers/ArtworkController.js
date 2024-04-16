@@ -1,7 +1,7 @@
 const Artwork = require('../models/Artwork');
 
 const ArtworkController = {
-    async create(req, res) {
+    async createArtwork(req, res) {
         try {
             const artwork = await Artwork.create({ ...req.body });
             res.status(201).send(artwork);
@@ -45,11 +45,23 @@ const ArtworkController = {
     },
     async getByID(req, res) {
         try {
-            const id = req.params._id
+            const id = req.params._id;
             const artwork = await Artwork.findById(id);
             res.json(artwork);
         } catch (error) {
             console.log(error);
+        }
+    },
+    async deleteArtwork(req, res) {
+        try {
+            const id = req.params._id;
+            const deleteArtwork = await Artwork.findByIdAndDelete(id);
+            if (!deleteArtwork) {
+                return res.status(404).json({ message: "This artwork does not exist." });
+            }
+            res.status(200).json({ message: "Artwork deleted.", deleteArtwork });
+        } catch (error) {
+            console.log(error)
         }
     }
 };
