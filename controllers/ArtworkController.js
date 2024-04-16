@@ -42,6 +42,15 @@ const ArtworkController = {
         } catch (error) {
             console.log(error);
         }
+    },
+    async getByID(req, res) {
+        try {
+            const id = req.params._id
+            const artwork = await Artwork.findById(id);
+            res.json(artwork);
+        } catch (error) {
+            console.log(error);
+        }
     }
 };
 
