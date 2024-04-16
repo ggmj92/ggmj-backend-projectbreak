@@ -114,7 +114,10 @@ const ArtworkController = {
                 <p>Description: ${artwork.description}</p>
                 <img src="/images/${artwork.image}" alt="${artwork.title}" />
                 <button><a href="/update/${artwork._id}">EDIT</a></button>
-                <button><a href="/">DELETE</a></button>
+                <form action="/delete/${artwork._id}" method="post" onsubmit="return confirm('Are you sure you want to delete this artwork?')">
+                    <button type="submit">DELETE</button>
+                </form>
+                
                 
             `)
         } catch (error) {
@@ -269,7 +272,26 @@ const ArtworkController = {
             console.log('Error during update:', error);
             res.status(500).send('Internal Server Error');
         }
-    }
+    },
+
+    async deleteArtworkSSR(req, res) {
+        try {
+            const id = req.params.id;
+            const artwork = await Artwork.findById(id);
+            if (!artwork) {
+                return res.send(`
+                    <button><a href="/home">Home</a></button>
+                    <h1>Error</h1>
+                    <h2>Artwork not found.</h2>
+                    `)
+            }
+            await Artwork.findByIdAndDelete(id);
+            res.redirect('/home');
+        } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal Server Error');
+        }
+    },
 }
 
 module.exports = ArtworkController, upload;

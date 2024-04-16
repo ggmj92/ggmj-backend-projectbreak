@@ -19,5 +19,6 @@ router.get('/update/:id', ArtworkController.updateArtworkSSR);
 router.post('/createArtworkSSR', upload.single('image'), ArtworkController.createArtworkSSRPost);
 router.post('/update/:id', upload.single('image'), ArtworkController.updateArtworkSSRPost);
 router.post('/artwork/:id', upload.single('image'), ArtworkController.updateArtworkSSRPost);
+router.post('/delete/:id', ArtworkController.deleteArtworkSSR);
 
 module.exports = router;
