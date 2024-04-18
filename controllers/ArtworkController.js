@@ -291,7 +291,6 @@ const ArtworkController = {
     },
 
     async updateArtworkSSRPost(req, res) {
-        console.log('Request body:', req.body);
         try {
             const header = headerTemplate();
             const footer = footerTemplate();
