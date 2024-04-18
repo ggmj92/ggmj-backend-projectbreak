@@ -1,5 +1,7 @@
 const Artwork = require('../models/Artwork');
 const upload = require('../middleware/uploadMiddleware').upload;
+const headerTemplate = require('./header');
+const footerTemplate = require('./footer');
 
 const ArtworkController = {
 
@@ -62,28 +64,29 @@ const ArtworkController = {
         try {
             const id = req.params._id;
             const artwork = await Artwork.find();
+            const header = headerTemplate();
+            const footer = footerTemplate();
+
             res.send(`
+            ${header}
             <h1 class="page-title">All Artwork</h1>
             <button><a href="/create">CREATE ARTWORK</a></button>
             <div class="card-container">
             ${artwork.map(artwork => {
                 return (
                     `
-                    <div class="artwork-card">
-                        <h2>${artwork.artist}</h2>
-                        <h3>${artwork.title}</h3>
-                        <p>${artwork.year}</p>
-                        <p>${artwork.type}</p>
-                        <p>${artwork.media}</p>
-                        <p>${artwork.dimensions}</p>
-                        <p>${artwork.location}</p>
-                        <p>${artwork.description}</p>
+                    <div class="card">
                         <img src="/images/${artwork.image}" alt="${artwork.title}" />
-                        <button><a href="/artwork/${artwork.id}">VIEW</a></button>
+                        <div class="card-content">
+                            <h2>${artwork.title}</h2>
+                            <h3>${artwork.artist}</h3>
+                        <button class="card-btn" onclick="location.href='/artwork/${artwork.id}';">VIEW</button>
+                        </div>
                     </div>`
                 )
             }).join('')}
             </div>
+            ${footer}
             `
             )
         } catch (error) {
@@ -95,30 +98,64 @@ const ArtworkController = {
         try {
             const id = req.params.id;
             const artwork = await Artwork.findById(id);
+            const header = headerTemplate();
+            const footer = footerTemplate();
             if (!artwork) {
                 return res.send(`
-                    <button><a href="/home">Home</a></button>
+                    ${header}
                     <h1>Error</h1>
                     <h2>Artwork not found.</h2>
+                    ${footer}
                     `)
             }
             res.send(`
-                <button><a href="/home">Home</a></button>
-                <h1>Title: ${artwork.title}</h1>
-                <h2>Artist: ${artwork.artist}</h2>
-                <p>Year: ${artwork.year}</p>
-                <p>Type: ${artwork.type}</p>
-                <p>Media: ${artwork.media}</p>
-                <p>Dimensions: ${artwork.dimensions}</p>
-                <p>Location: ${artwork.location}</p>
-                <p>Description: ${artwork.description}</p>
-                <img src="/images/${artwork.image}" alt="${artwork.title}" />
-                <button><a href="/update/${artwork._id}">EDIT</a></button>
-                <form action="/delete/${artwork._id}" method="post" onsubmit="return confirm('Are you sure you want to delete this artwork?')">
-                    <button type="submit">DELETE</button>
-                </form>
-                
-                
+                ${header}
+                <button><a href="/create">CREATE ARTWORK</a></button>
+                <div class="single-card-container">
+                    <div class="single-card" data-artwork-id="${artwork._id}">
+                        <div class="single-card-content">
+                            <h2>${artwork.title}</h2>
+                            <h3>${artwork.artist}</h3>
+                            <p>Year: ${artwork.year}</p>
+                            <p>Type: ${artwork.type}</p>
+                            <p>Media: ${artwork.media}</p>
+                            <p>Dimensions: ${artwork.dimensions}</p>
+                            <p>Location: ${artwork.location}</p>
+                            <p>Description: ${artwork.description}</p>
+                        </div>
+                        <img src="/images/${artwork.image}" alt="${artwork.title}" />
+                    </div>
+                    <button class="edit-btn">EDIT</button>
+                    <button class="delete-btn" data-artwork-id="${artwork._id}">DELETE</button>
+                </div>
+                ${footer}
+                <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const editBtns = document.querySelectorAll('.edit-btn');
+                    const deleteBtns = document.querySelectorAll('.delete-btn');
+
+                    editBtns.forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const artworkId = btn.parentElement.dataset.artworkId;
+                            window.location.href = '/update/${id}';
+                        });
+                    });
+
+                    deleteBtns.forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const result = confirm("Are you sure you want to delete this artwork?");
+                            if (result) {
+                            const response = await fetch('/id/${id}', { method: 'DELETE' });
+                            if (response.ok) {
+                                window.location.href = '/home';
+                            } else {
+                                console.log('Error deleting artwork');
+                            }
+                        }
+                        });
+                    });
+                });
+            </script>
             `)
         } catch (error) {
             console.log(error);
@@ -129,6 +166,7 @@ const ArtworkController = {
     async createArtworkSSR(req, res) {
         if (req.method === 'POST') {
             try {
+
                 const artwork = await Artwork.create({ ...req.body, image: req.file.filename });
                 res.redirect(`/artwork/${artwork._id}`);
             } catch (error) {
@@ -136,45 +174,53 @@ const ArtworkController = {
                 res.status(500).send({ error: error.message });
             }
         } else {
+            const header = headerTemplate();
+            const footer = footerTemplate();
+
             res.send(`
-                <button><a href="/home">Home</a></button>
-                <h1>Create Artwork</h1>
+                ${header}
+                <h1 class="page-title">Create Artwork</h1>
+                <div class="form-container">
                 <form action="/createArtworkSSR" method="post" enctype="multipart/form-data">
-                <label for="artist">Artist:</label>
-                <input type="text" id="artist" name="artist" required>
+                <label for="artist" class="form-label">Artist:</label>
+                <input type="text" id="artist" name="artist" class="form-input" required>
 
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" id="title" name="title" class="form-input" required>
 
-                <label for="year">Year:</label>
-                <input type="number" id="year" name="year" >
+                <label for="year" class="form-label">Year:</label>
+                <input type="number" id="year" name="year" class="form-input" >
 
-                <label for="type">Type:</label>
-                <input type="text" id="type" name="type" >
+                <label for="type" class="form-label">Type:</label>
+                <input type="text" id="type" name="type" class="form-input" >
 
-                <label for="media">Media:</label>
-                <input type="text" id="media" name="media" >
+                <label for="media" class="form-label">Media:</label>
+                <input type="text" id="media" name="media" class="form-input" >
 
-                <label for="dimensions">Dimensions:</label>
-                <input type="text" id="dimensions" name="dimensions" >
+                <label for="dimensions" class="form-label">Dimensions:</label>
+                <input type="text" id="dimensions" name="dimensions" class="form-input" >
 
-                <label for="location">Location:</label>
-                <input type="text" id="location" name="location" >
+                <label for="location" class="form-label">Location:</label>
+                <input type="text" id="location" name="location" class="form-input" >
 
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" ></textarea>
+                <label for="description" class="form-label">Description:</label>
+                <textarea id="description" name="description" class="form-textarea"></textarea>
 
-                <label for="Image">Upload Image:</label>
-                <input type="file" id="image" name="image" >
+                <label for="Image" class="form-label">Upload Image:</label>
+                <input type="file" id="image" name="image" class="form-file">
 
-                <button type="submit">Create Artwork</button>
+                <button type="submit" class="form-button">Create Artwork</button>
               </form>
+              </div>
+              ${footer}
             `)
         }
     },
 
     async createArtworkSSRPost(req, res) {
         try {
+            const header = headerTemplate();
+            const footer = footerTemplate();
             const artwork = await Artwork.create({ ...req.body, image: req.file.filename });
             res.redirect(`/artwork/${artwork._id}`);
         } catch (error) {
@@ -184,51 +230,60 @@ const ArtworkController = {
     },
 
     async updateArtworkSSR(req, res) {
+        const header = headerTemplate();
+        const footer = footerTemplate();
         try {
             const id = req.params.id;
             const artwork = await Artwork.findById(id);
             if (!artwork) {
+                
                 return res.send(`
-                    <button><a href="/home">Home</a></button>
+                    ${header}
                     <h1>Error</h1>
                     <h2>Artwork not found.</h2>
+                    ${footer}
                         `)
-            }
+            } else {
             res.send(`
-                    <button><a href="/home">Home</a></button>
+                    ${header}
                     <h1>Update Artwork</h1>
+                    <a href="/artwork/${artwork._id}" class="back-btn">Back</a>
+                    <div class="form-container">
                     <form action="/update/${artwork._id}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_id" value="${artwork._id}">
-                        <label for="artist">Artist:</label>
-                        <input type="text" id="artist" name="artist" value="${artwork.artist}" required>
+                        <label for="artist" class="form-label">Artist:</label>
+                        <input type="text" id="artist" name="artist" class="form-input" value="${artwork.artist}" required>
       
-                        <label for="title">Title:</label>
-                        <input type="text" id="title" name="title" value="${artwork.title}" required>
+                        <label for="title" class="form-label">Title:</label>
+                        <input type="text" id="title" name="title" class="form-input" value="${artwork.title}" required>
       
-                        <label for="year">Year:</label>
-                        <input type="number" id="year" name="year" value="${artwork.year}">
+                        <label for="year" class="form-label">Year:</label>
+                        <input type="number" id="year" name="year" class="form-input" value="${artwork.year}">
       
-                        <label for="type">Type:</label>
-                        <input type="text" id="type" name="type" value="${artwork.type}">
+                        <label for="type" class="form-label">Type:</label>
+                        <input type="text" id="type" name="type" class="form-input" value="${artwork.type}">
       
-                        <label for="media">Media:</label>
-                        <input type="text" id="media" name="media" value="${artwork.media}">
+                        <label for="media" class="form-label">Media:</label>
+                        <input type="text" id="media" name="media" class="form-input" value="${artwork.media}">
       
-                        <label for="dimensions">Dimensions:</label>
-                        <input type="text" id="dimensions" name="dimensions" value="${artwork.dimensions}">
+                        <label for="dimensions" class="form-label">Dimensions:</label>
+                        <input type="text" id="dimensions" name="dimensions" class="form-input" value="${artwork.dimensions}">
       
-                        <label for="location">Location:</label>
-                        <input type="text" id="location" name="location" value="${artwork.location}">
+                        <label for="location" class="form-label">Location:</label>
+                        <input type="text" id="location" name="location" class="form-input" value="${artwork.location}">
       
-                        <label for="description">Description:</label>
-                        <textarea id="description" name="description">${artwork.description}</textarea>
+                        <label for="description" class="form-label">Description:</label>
+                        <textarea id="description" name="description" class="form-textarea">${artwork.description}</textarea>
       
-                        <label for="Image">Upload Image:</label>
-                        <input type="file" id="image" name="image">
+                        <label for="Image" class="form-label">Upload Image:</label>
+                        <input type="file" id="image" name="image" class="form-file">
       
                     <button type="submit">Update Artwork</button>
+                    </div>
                     </form>
+                    ${footer}
                 `);
+            }
         } catch (error) {
             console.log(error);
             res.status(500).send('Internal Server Error')
@@ -238,6 +293,8 @@ const ArtworkController = {
     async updateArtworkSSRPost(req, res) {
         console.log('Request body:', req.body);
         try {
+            const header = headerTemplate();
+            const footer = footerTemplate();
             const id = req.params.id;
             const artwork = await Artwork.findById(id);
             if (!artwork) {
@@ -276,13 +333,16 @@ const ArtworkController = {
 
     async deleteArtworkSSR(req, res) {
         try {
+            const header = headerTemplate();
+            const footer = footerTemplate();
             const id = req.params.id;
             const artwork = await Artwork.findById(id);
             if (!artwork) {
                 return res.send(`
-                    <button><a href="/home">Home</a></button>
+                    ${header}
                     <h1>Error</h1>
                     <h2>Artwork not found.</h2>
+                    ${footer}
                     `)
             }
             await Artwork.findByIdAndDelete(id);
