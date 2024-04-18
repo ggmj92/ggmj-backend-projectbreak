@@ -10,7 +10,7 @@ const headerTemplate = () => {
         </head>
         <body>
             <header>GGMJ's Art Project</header>
-            <div class="nav-bar">
+            <div class="homeBtn">
                 <button onclick="goToHome()">Home</button>
             </div>
             <script>

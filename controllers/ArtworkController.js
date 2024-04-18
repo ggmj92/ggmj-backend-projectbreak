@@ -70,7 +70,7 @@ const ArtworkController = {
             res.send(`
             ${header}
             <h1 class="page-title">All Artwork</h1>
-            <button><a href="/create">CREATE ARTWORK</a></button>
+            <button class="createBtn" onclick="location.href='/create';">CREATE ARTWORK</button>
             <div class="card-container">
             ${artwork.map(artwork => {
                 return (
@@ -110,7 +110,7 @@ const ArtworkController = {
             }
             res.send(`
                 ${header}
-                <button><a href="/create">CREATE ARTWORK</a></button>
+                <button class="createBtn" onclick="location.href='/create';">CREATE ARTWORK</button>
                 <div class="single-card-container">
                     <div class="single-card" data-artwork-id="${artwork._id}">
                         <div class="single-card-content">
@@ -209,7 +209,7 @@ const ArtworkController = {
                 <label for="Image" class="form-label">Upload Image:</label>
                 <input type="file" id="image" name="image" class="form-file">
 
-                <button type="submit" class="form-button">Create Artwork</button>
+                <button type="submit" class="form-button">Create</button>
               </form>
               </div>
               ${footer}
@@ -246,8 +246,9 @@ const ArtworkController = {
             } else {
             res.send(`
                     ${header}
-                    <h1>Update Artwork</h1>
-                    <a href="/artwork/${artwork._id}" class="back-btn">Back</a>
+                    <h1 class="page-title">Update Artwork</h1>
+                    <button class="backBtn" onclick="location.href='/artwork/${artwork._id}';">Back</button>
+
                     <div class="form-container">
                     <form action="/update/${artwork._id}" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_id" value="${artwork._id}">
@@ -278,7 +279,7 @@ const ArtworkController = {
                         <label for="Image" class="form-label">Upload Image:</label>
                         <input type="file" id="image" name="image" class="form-file">
       
-                    <button type="submit">Update Artwork</button>
+                    <button type="submit" class="form-button">Update</button>
                     </div>
                     </form>
                     ${footer}

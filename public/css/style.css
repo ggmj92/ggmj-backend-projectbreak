@@ -109,6 +109,44 @@ footer {
     align-items: right;
 }
 
+.homeBtn button, .createBtn, .backBtn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #132049;
+    color: whitesmoke;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 16px;
+    margin-left: 20px ;
+    align-items: right;
+}
+
+.edit-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: whitesmoke;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 16px;
+    margin-left: 20px ;
+    align-items: right;
+}
+
+.delete-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color:indianred;
+    color: whitesmoke;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 16px;
+    margin-left: 20px ;
+    align-items: right;
+}
+
+
+
 /* CREATE FORM */
 .page-title {
     text-align: center;
@@ -172,7 +210,6 @@ footer {
   }
 
 
-
 /* SINGLE ARTWORK VIEW */
 
 .single-card-container {
@@ -197,7 +234,6 @@ footer {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    
 }
 
 .single-card-content {
